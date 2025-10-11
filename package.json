@@ -1,0 +1,14 @@
+{
+  "name": "dyntable",
+  "version": "0.1.0",
+  "author": "RedPolygon",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "esbuild": "^0.25.10"
+  },
+  "scripts": {
+    "build": "esbuild src/Table.ts --bundle --outfile=build/dyntable.js --format=esm --minify --sourcemap",
+    "watch": "esbuild src/Table.ts --bundle --outfile=build/dyntable.js --format=esm --minify --sourcemap --watch"
+  }
+}
