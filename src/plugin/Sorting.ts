@@ -51,11 +51,13 @@ export default class Sorting implements Plugin {
 		elem.classList.toggle("sort-column", column.name == this.by)
 		if (column.name == this.by) elem.classList.add(this.descending ? "sort-descending" : "sort-ascending")
 
+		elem.addEventListener("click", this.thClick(column))
+
 		const div = document.createElement("div")
 		div.classList.add("table-sort")
 
-		const btn = document.createElement("button")
-		btn.addEventListener("click", this.thClick(column))
+		const arrows = document.createElement("span")
+		arrows.classList.add("sort-arrows")
 
 		const up = document.createElement("span")
 		up.innerText = arrowUp
@@ -65,13 +67,13 @@ export default class Sorting implements Plugin {
 		down.innerText = arrowDown
 		down.classList.toggle("active", column.name == this.by && this.descending)
 
-		btn.append(up, "\n", down)
+		arrows.append(up, "\n", down)
 
 		// Move all existing children into the div
 		while (elem.firstChild) div.append(elem.firstChild)
 
-		if (column.align == "left") div.append(btn)
-		else div.prepend(btn)
+		if (column.align == "left") div.append(arrows)
+		else div.prepend(arrows)
 
 		elem.append(div)
 	}
