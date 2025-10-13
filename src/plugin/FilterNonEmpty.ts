@@ -1,5 +1,5 @@
 import Plugin from "../Plugin"
-import Table, { Entry } from "../Table"
+import Table, { Column, Data, Entry } from "../Table"
 
 /**
  * Filter out entries that do not have any values.
@@ -18,8 +18,8 @@ export default class FilterNonEmpty implements Plugin {
 		this.table = table
 	}
 
-	dataTransform = (entries: Entry[]) =>
-		entries.filter(this.isNonemptyEntry.bind(this))
+	dataTransform = ({ columns, entries }: Data): Data =>
+		({ columns, entries: entries.filter(this.isNonemptyEntry.bind(this)) })
 
 	isNonemptyEntry = (entry: Entry): boolean =>
 		entry.filter((value, idx) =>

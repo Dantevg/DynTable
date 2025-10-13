@@ -1,5 +1,5 @@
 import Plugin from "../Plugin"
-import Table, { Column, Entry } from "../Table"
+import Table, { Column, Data, Entry } from "../Table"
 import Pagination from "./Pagination"
 
 const getFromURL = (by: string, descending: boolean): [string, boolean] => {
@@ -78,7 +78,8 @@ export default class Sorting implements Plugin {
 		elem.append(div)
 	}
 
-	dataTransform = (entries: Entry[]) => this.sort(entries)
+	dataTransform = ({ columns, entries }: Data) =>
+		({ columns, entries: this.sort(entries) })
 
 	thClick(column: Column) {
 		return () => {

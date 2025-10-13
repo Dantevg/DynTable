@@ -1,5 +1,5 @@
 import Plugin from "../Plugin"
-import Table, { Entry } from "../Table"
+import Table, { Data, Entry } from "../Table"
 
 /**
  * Remove values considered empty from the table data.
@@ -22,6 +22,6 @@ export default class RemoveEmpty implements Plugin {
 		this.table = table
 	}
 
-	dataTransform = (entries: Entry[]) =>
-		entries.map(entry => entry.map(value => this.emptyValues.has(value) ? undefined : value))
+	dataTransform = ({ columns, entries }: Data) =>
+		({ columns, entries: entries.map(entry => entry.map(value => this.emptyValues.has(value) ? undefined : value)) })
 }

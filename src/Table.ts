@@ -1,6 +1,7 @@
 import Plugin from "./Plugin"
 
 export * as format from "./format"
+export { default as BarChart } from "./plugin/BarChart"
 export { default as FilterNonEmpty } from "./plugin/FilterNonEmpty"
 export { default as InsertColumn } from "./plugin/InsertColumn"
 export { default as Pagination } from "./plugin/Pagination"
@@ -17,10 +18,12 @@ export type Column = {
 	align?: Alignment
 }
 
+export type Data = { columns: Column[], entries: Entry[] }
+
 export type thCreationHandler = (elem: HTMLTableCellElement, column: Column) => void
 export type trCreationHandler = (elem: HTMLTableRowElement, entry?: Entry) => void
 export type tdCreationHandler = (elem: HTMLTableCellElement, column: Column, entry: Entry, value: any) => void
-export type dataTransform = (entries: Entry[]) => Entry[]
+export type dataTransform = (data: Data) => Data
 
 const createHandlerList = <T extends (...args: any[]) => void>(handlers: T[]) =>
 	(...args: Parameters<T>) => {
@@ -46,7 +49,6 @@ type CreationHandlers = {
 export default class Table {
 	plugins: Map<Function, Plugin> = new Map()
 	creationHandlers: CreationHandlers
-	dataPipeline: dataTransform[] = []
 	dataTransform: dataTransform
 
 	constructor(
@@ -58,6 +60,7 @@ export default class Table {
 		const thCreationHandlers: thCreationHandler[] = []
 		const trCreationHandlers: trCreationHandler[] = []
 		const tdCreationHandlers: tdCreationHandler[] = []
+		const dataPipeline: dataTransform[] = []
 
 		for (const plugin of plugins) {
 			this.plugins.set(plugin.constructor, plugin)
@@ -65,10 +68,10 @@ export default class Table {
 			addHandler(thCreationHandlers, plugin.thCreate?.bind(plugin))
 			addHandler(trCreationHandlers, plugin.trCreate?.bind(plugin))
 			addHandler(tdCreationHandlers, plugin.tdCreate?.bind(plugin))
-			addHandler(this.dataPipeline, plugin.dataTransform?.bind(plugin))
+			addHandler(dataPipeline, plugin.dataTransform?.bind(plugin))
 		}
 
-		this.dataTransform = createPipeline(this.dataPipeline)
+		this.dataTransform = createPipeline(dataPipeline)
 
 		this.creationHandlers = {
 			th: createHandlerList(thCreationHandlers),
@@ -107,12 +110,12 @@ export default class Table {
 	createBody(): HTMLTableSectionElement {
 		const tbody = document.createElement("tbody")
 
-		const entries = this.dataTransform(this.entries)
+		const { columns, entries } = this.dataTransform({ columns: this.columns, entries: this.entries })
 
 		for (const entry of entries) {
 			const tr = tbody.appendChild(document.createElement("tr"))
-			for (let i = 0; i < this.columns.length; i++) {
-				const column = this.columns[i]
+			for (let i = 0; i < columns.length; i++) {
+				const column = columns[i]
 				const td = tr.appendChild(document.createElement("td"))
 				td.setAttribute("data-column", column.name)
 				if (column.align != undefined) td.setAttribute("data-align", column.align)

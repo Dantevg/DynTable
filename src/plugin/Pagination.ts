@@ -1,5 +1,5 @@
 import Plugin from "../Plugin"
-import Table, { Entry } from "../Table"
+import Table, { Column, Data, Entry } from "../Table"
 
 /**
  * Add pagination controls to the table.
@@ -70,10 +70,10 @@ export default class Pagination implements Plugin {
 		this.table = table
 	}
 
-	dataTransform = (entries: Entry[]) => {
+	dataTransform = ({ columns, entries }: Data): Data => {
 		this.maxPage = (this.displayCount > 0) ? Math.ceil(entries.length / this.displayCount) : 1
 		this.update()
-		return entries.slice(...this.getRange(entries.length))
+		return { columns, entries: entries.slice(...this.getRange(entries.length)) }
 	}
 
 	changePage(page: number) {
